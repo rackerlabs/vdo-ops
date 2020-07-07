@@ -19,13 +19,6 @@ class VCenterConnectionError(Exception):
     pass
 
 
-class VirtualMachineConnectionParameters:
-    def __init__(self, uuid, username, password):
-        self.uuid = uuid
-        self.username = username
-        self.password = password
-
-
 class VcenterConnectionParameters:
     def __init__(self, host, username, password, port=443):
         self.host = host
@@ -137,144 +130,6 @@ class AlarmsClient(VsphereClient):
                 print("alarm not found")
 
 
-class GuestOperationsApiClient(VsphereClient):
-    def __init__(
-        self,
-        vc_params: VcenterConnectionParameters,
-        vm_params: VirtualMachineConnectionParameters,
-    ):
-        super().__init__(vc_params)
-        self.vm_params = vm_params
-
-    def execute_command(self, command, arguments):
-        """
-        Executes a command from within the VM's guest OS and returns the process ID.
-        """
-        with vcenter_connection(self.vc_params) as service_instance:
-            content = service_instance.RetrieveContent()
-
-            # https://www.vmware.com/support/orchestrator/doc/vco_vsphere55_api/html/VcSearchIndex.html
-            datacenter = None
-            vm_search = True
-            instance_uuid = True
-
-            vm = content.searchIndex.FindByUuid(
-                datacenter, self.vm_params.uuid, vm_search, instance_uuid
-            )
-            creds = vim.vm.guest.NamePasswordAuthentication(
-                username=self.vm_params.username, password=self.vm_params.password
-            )
-            program_spec = vim.vm.guest.ProcessManager.ProgramSpec(
-                programPath=command, arguments=arguments
-            )
-
-            return content.guestOperationsManager.processManager.StartProgramInGuest(
-                vm, creds, program_spec
-            )
-
-    def get_exit_code(self, process_id):
-        """
-        Returns the exit code of the process identified by the given process ID
-        if it has completed execution. If the process is still executing, None
-        is returned.
-        """
-        with vcenter_connection(self.vc_params) as service_instance:
-            content = service_instance.RetrieveContent()
-
-            vm = content.searchIndex.FindByUuid(None, self.vm_params.uuid, True, True)
-            creds = vim.vm.guest.NamePasswordAuthentication(
-                username=self.vm_params.username, password=self.vm_params.password
-            )
-
-            processes = content.guestOperationsManager.processManager.ListProcessesInGuest(
-                vm, creds, [process_id]
-            )
-            if processes:
-                return processes.pop().exitCode
-            else:
-                raise Exception("Guest Ops Process not found")
-
-    def delete_file(self, file_path):
-        """
-        Deletes a file from within a VM.
-        """
-        with vcenter_connection(self.vc_params) as service_instance:
-            content = service_instance.RetrieveContent()
-            vm = content.searchIndex.FindByUuid(None, self.vm_params.uuid, True)
-            creds = vim.vm.guest.NamePasswordAuthentication(
-                username=self.vm_params.username, password=self.vm_params.password
-            )
-
-            content.guestOperationsManager.fileManager.DeleteFileInGuest(
-                vm, creds, file_path
-            )
-
-    def copy_file_from_vm(self, file_path):
-        """
-        Downloads a file from a VM.
-
-        The method returns a requests response object with a streamed response entity.
-        """
-        with vcenter_connection(self.vc_params) as service_instance:
-            content = service_instance.RetrieveContent()
-            vm = content.searchIndex.FindByUuid(None, self.vm_params.uuid, True)
-            creds = vim.vm.guest.NamePasswordAuthentication(
-                username=self.vm_params.username, password=self.vm_params.password
-            )
-
-            download_url = content.guestOperationsManager.fileManager.InitiateFileTransferFromGuest(
-                vm, creds, file_path
-            )
-
-            upload_response = requests.get(  # nosec
-                download_url, verify=False, stream=True
-            )
-            upload_response.raise_for_status()
-
-    def copy_file_to_vm(self, file_stream, file_size, file_path):
-        """
-        Uploads a file to a VM.
-        """
-        with vcenter_connection(self.vc_params) as service_instance:
-            content = service_instance.RetrieveContent()
-            vm = content.searchIndex.FindByUuid(None, self.vm_params.uuid, True)
-            creds = vim.vm.guest.NamePasswordAuthentication(
-                username=self.vm_params.username, password=self.vm_params.password
-            )
-
-            file_attribute = vim.vm.guest.FileManager.FileAttributes()
-            upload_url = content.guestOperationsManager.fileManager.InitiateFileTransferToGuest(
-                vm, creds, file_path, file_attribute, file_size, True
-            )
-
-            upload_response = requests.put(  # nosec
-                upload_url, data=file_stream, verify=False
-            )
-            upload_response.raise_for_status()
-
-    def validate_credentials(self):
-        """
-        Validates the credentials of a given VM
-        """
-        with vcenter_connection(self.vc_params) as service_instance:
-            content = service_instance.RetrieveContent()
-
-            vm = content.searchIndex.FindByUuid(None, self.vm_params.uuid, True, True)
-
-            if not vm:
-                raise VmNotFound(
-                    f"no VM with UUID {self.vm_params.uuid} was found in the vCenter"
-                )
-
-            creds = vim.vm.guest.NamePasswordAuthentication(
-                username=self.vm_params.username, password=self.vm_params.password
-            )
-
-            return content.guestOperationsManager.authManager.ValidateCredentialsInGuest(
-                vm, creds
-            )
-
-
 class VirtualMachineClient(VsphereClient):
     def is_vm_powered_on(self, vm_uuid):
         """
@@ -320,6 +175,26 @@ class VirtualMachineClient(VsphereClient):
         """
         with vcenter_connection(self.vc_params) as service_instance:
             return service_instance.RetrieveContent()
+
+
+class NetworkCopyClient(VsphereClient):
+    def getPortgroupsByVirtualSwitch(self, vswitch_name):
+        return None
+
+    def isInDoNotCopyList(self, portgroup_name):
+        return None
+
+    def hasVirtualSwitch(self, vswitch_name):
+        return None
+
+    def hasPortgroup(self, portgroup_name):
+        return None
+
+    def addVirtualSwitch(self, vswitch):
+        return None
+
+    def addPortgroup(self, portgroup):
+        return None
 
 
 class vcenter_connection:

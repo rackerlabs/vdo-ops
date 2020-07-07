@@ -1,0 +1,6 @@
+arrow==0.14.2
+fleece==0.18.3
+PyJWT==1.7.1
+pyvmomi==v6.7.1.2018.12
+pynamodb==4.0.0
+troposphere==2.5.2
