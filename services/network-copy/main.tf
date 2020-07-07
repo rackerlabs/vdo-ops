@@ -30,11 +30,11 @@ provider "aws" {
   region = "${var.region}"
 }
 
-data "terraform_remote_state" "vdo_ops_infra" {
+data "terraform_remote_state" "vdo_infra" {
   backend = "s3"
 
   config {
-    bucket = "vdo-ops-terraform-state-${var.stage == "prod" ? "prod" : "dev"}"
+    bucket = "vdo-terraform-state-${var.stage == "prod" ? "prod" : "dev"}"
     key    = "vdo-infrastructure/terraform.tfstate"
     region = "${var.region}"
   }
@@ -96,7 +96,7 @@ data "aws_iam_policy_document" "ssm_read" {
     # We can scope the SSM params down after we figure out what the namespace
     # will be.
     resources = [
-      "${data.terraform_remote_state.vdo_ops_infra.vdo_secrets_kms_key_arn}",
+      "${data.terraform_remote_state.vdo_infra.vdo_secrets_kms_key_arn}",
       "arn:aws:ssm:*:*:parameter/*",
     ]
   }
@@ -128,8 +128,8 @@ module "vdo_ops_network_copy" {
   alarm_actions = "${concat(var.alarm_topic_arns, formatlist("arn:aws:sns:%s:%s:%s", var.region, data.aws_caller_identity.current.account_id, var.alarm_topic_names))}"
 
   # VPC Configuration
-  subnet_ids         = ["${data.terraform_remote_state.vdo_ops_infra.private_subnets}"]
-  security_group_ids = ["${data.terraform_remote_state.vdo_ops_infra.default_security_group_id}"]
+  subnet_ids         = ["${data.terraform_remote_state.vdo_infra.private_subnets}"]
+  security_group_ids = ["${data.terraform_remote_state.vdo_infra.default_security_group_id}"]
 }
 
 resource "aws_iam_role_policy" "vdo_ops_network_copy_read_policy" {

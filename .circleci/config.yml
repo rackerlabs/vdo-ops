@@ -175,7 +175,7 @@ workflows:
       - terraform_user:
           requires:
             - aws_auth
-            - test-network-copys
+            - test-network-copy
             - build-network-copy
           filters:
             branches:
