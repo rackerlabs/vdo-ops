@@ -1,0 +1,4 @@
+fleece==0.18.3
+pyvmomi==v6.7.1.2018.12
+pynamodb==4.0.0
+PyJWT==1.7.1

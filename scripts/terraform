@@ -1,0 +1,32 @@
+#!/usr/bin/env sh
+
+STAGE=$1
+SERVICE_NAME=$2
+SERVICE_DIR=$3
+PATH=${PWD}/bin:$PATH
+
+set -e
+
+current_dir=$(pwd)
+export TF_VAR_version=${CIRCLE_SHA1:-"0.0.0"}
+
+if [ -z "${STAGE}" ]; then
+  echo "Usage: scripts/terraform <stage> <service_name> <service_directory>"
+  exit 1
+fi
+
+if [ "$STAGE" == "prod" ]; then
+  BUCKET="vdo-ops-terraform-state-prod"
+else
+  BUCKET="vdo-ops-terraform-state-dev"
+fi
+
+trap 'cd "$current_dir"' EXIT
+
+cd ${SERVICE_DIR}
+terraform init -input=false -backend-config="bucket=${BUCKET}" \
+  -backend-config="key=${SERVICE_NAME}/${STAGE}/terraform.tfstate"
+
+terraform plan -input=false -var "stage=${STAGE}" -out=terraform.plan
+
+terraform apply -auto-approve terraform.plan
