@@ -1,0 +1,8 @@
+-r src/requirements.txt
+
+black
+coverage
+mock
+pytest
+requests_mock
+pytest-mock

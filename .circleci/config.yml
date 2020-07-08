@@ -1,0 +1,221 @@
+version: 2.1
+
+commands:
+  build-lambda:
+    description: "Build Lambda package for deployment"
+    parameters:
+      service:
+        type: string
+      path:
+        type: string
+    steps:
+      - checkout
+      - setup_remote_docker
+      - attach_workspace:
+          at: ~/vdo-ops
+      - run: find -L services/<< parameters.service >>/src -type f -exec shasum -a 256 {} \; > services/<< parameters.service >>/src_shasum
+      - restore_cache:
+          keys:
+            - dist-<< parameters.service >>-{{ checksum "<< parameters.path >>/src/requirements.txt"}}-{{ checksum "<< parameters.path >>/src_shasum" }}
+      - run:
+          name: Build <<parameters.service>>
+          command: |
+            if [ ! -f "<< parameters.path >>/dist/lambda_function.zip" ]; then fleece build --python36 << parameters.path >>; fi
+      - save_cache:
+          key: dist-<< parameters.service >>-{{ checksum "<< parameters.path >>/src/requirements.txt"}}-{{ checksum "<< parameters.path >>/src_shasum" }}
+          paths:
+            - << parameters.path >>/dist
+      - persist_to_workspace:
+          root: ~/vdo-ops
+          paths:
+            - << parameters.path >>/dist
+  deploy:
+    description: "Deploy Service"
+    parameters:
+      service:
+        type: string
+      path:
+        type: string
+      stage:
+        type: string
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/vdo-ops
+      - run:
+          name: Deploy << parameters.service >> to << parameters.stage >> stage
+          command: |
+            if [[ "<< parameters.stage >>"  == "user" ]]; then export STAGE=${CIRCLE_PR_USERNAME:-$CIRCLE_USERNAME}; else export STAGE="<< parameters.stage >>"; fi
+            sh ./scripts/terraform ${STAGE} << parameters.service >> << parameters.path >>
+
+  test:
+    description: "Test Service"
+    parameters:
+      service:
+        type: string
+      path:
+        type: string
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/vdo-ops
+      - run:
+          name: Test << parameters.service >>
+          command: tox -c << parameters.path >>
+
+orbs:
+  aws-cli: circleci/aws-cli@0.1.13
+
+jobs:
+  build-network-copy:
+    docker:
+      - image: ryandub/xplat-ci-images:latest
+    working_directory: ~/vdo-ops
+    steps:
+      - build-lambda:
+          service: network-copy
+          path: ./services/network-copy
+
+  test-network-copy:
+    docker:
+      - image: ryandub/xplat-ci-images:latest
+    working_directory: ~/vdo-ops
+    steps:
+      - test:
+          service: network-copy
+          path: ./services/network-copy
+
+  terraform_user:
+    docker:
+      - image: hashicorp/terraform:0.11.14
+    environment:
+      AWS_PROFILE: vdo-ci-dev
+    working_directory: ~/vdo-ops
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/.aws
+      - deploy:
+          service: network-copy
+          path: ./services/network-copy
+          stage: user
+
+  terraform_dev: &terraform_dev
+    docker:
+      - image: hashicorp/terraform:0.11.14
+    environment:
+      AWS_PROFILE: vdo-ci-dev
+    working_directory: ~/vdo-ops
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/.aws
+      - deploy:
+          service: network-copy
+          path: ./services/network-copy
+          stage: dev
+
+  terraform_dev_from_user: *terraform_dev
+
+  terraform_prod:
+    docker:
+      - image: hashicorp/terraform:0.11.14
+    environment:
+      AWS_PROFILE: vdo-ci-prod
+    working_directory: ~/vdo-ops
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/.aws
+      - deploy:
+          service: network-copy
+          path: ./services/network-copy
+          stage: prod
+
+  aws_auth:
+    executor: aws-cli/default
+    working_directory: ~/vdo-ops
+    environment:
+      AWS_REGION: us-west-2
+    steps:
+      - checkout
+      - aws-cli/install
+      - aws-cli/configure:
+          profile-name: vdo-ci-dev
+          aws-access-key-id: AWS_ACCESS_KEY_ID_DEV
+          aws-secret-access-key: AWS_SECRET_ACCESS_KEY_DEV
+          aws-region: AWS_REGION
+      - aws-cli/configure:
+          profile-name: vdo-ci-prod
+          aws-access-key-id: AWS_ACCESS_KEY_ID_PROD
+          aws-secret-access-key: AWS_SECRET_ACCESS_KEY_PROD
+          aws-region: AWS_REGION
+      - persist_to_workspace:
+          root: ~/.aws
+          paths:
+            - "*"
+      - run:
+          command: scripts/bootstrap-terraform dev
+          environment:
+            AWS_PROFILE: vdo-ci-dev
+      - run:
+          command: scripts/bootstrap-terraform prod
+          environment:
+            AWS_PROFILE: vdo-ci-prod
+
+workflows:
+  release:
+    jobs:
+      - test-network-copy:
+          context: vdo
+      - aws_auth:
+          context: vdo
+      - build-network-copy:
+          context: vdo
+      - terraform_user:
+          requires:
+            - aws_auth
+            - test-network-copy
+            - build-network-copy
+          filters:
+            branches:
+              ignore:
+                - master
+
+      - approve_dev_deploy:
+          type: approval
+          requires:
+            - terraform_user
+          filters:
+            branches:
+              ignore:
+                - master
+
+      - terraform_dev_from_user:
+          requires:
+            - approve_dev_deploy
+          filters:
+            branches:
+              ignore:
+                - master
+
+      - terraform_dev:
+          requires:
+            - aws_auth
+            - test-network-copy
+            - build-network-copy
+          context: vdo
+          filters:
+            branches:
+              only:
+                - master
+
+      - terraform_prod:
+          requires:
+            - aws_auth
+            - build-network-copy
+          context: vdo
+          filters:
+            branches:
+              only:
+                - master
