@@ -1,221 +1,334 @@
 version: 2.1
-
+deploy_defaults: &deploy_defaults
+  executor: sam_build
+  environment:
+    AWS_DEFAULT_REGION: us-west-2
+variables:
+  # use pyproject.toml for both dev and prod (lamda) deps
+  - &pip_cache_name pip-{{ checksum "poetry.lock" }}-{{ checksum "pyproject.toml" }}
+  # the content of virtualenv is based on pyproject.toml
+  - &poetry_cache_name pypoetry-{{ checksum "poetry.lock" }}-{{ checksum "pyproject.toml" }}
+orbs:
+  aws-cli: circleci/aws-cli@0.1.19
+  slack: circleci/slack@3.4.2
+executors:
+  sam_build:
+    docker:
+      - image: chalupaul/sambuild:latest
 commands:
-  build-lambda:
-    description: "Build Lambda package for deployment"
+  set_bash_vars:
     parameters:
-      service:
-        type: string
-      path:
-        type: string
-    steps:
-      - checkout
-      - setup_remote_docker
-      - attach_workspace:
-          at: ~/vdo-ops
-      - run: find -L services/<< parameters.service >>/src -type f -exec shasum -a 256 {} \; > services/<< parameters.service >>/src_shasum
-      - restore_cache:
-          keys:
-            - dist-<< parameters.service >>-{{ checksum "<< parameters.path >>/src/requirements.txt"}}-{{ checksum "<< parameters.path >>/src_shasum" }}
-      - run:
-          name: Build <<parameters.service>>
-          command: |
-            if [ ! -f "<< parameters.path >>/dist/lambda_function.zip" ]; then fleece build --python36 << parameters.path >>; fi
-      - save_cache:
-          key: dist-<< parameters.service >>-{{ checksum "<< parameters.path >>/src/requirements.txt"}}-{{ checksum "<< parameters.path >>/src_shasum" }}
-          paths:
-            - << parameters.path >>/dist
-      - persist_to_workspace:
-          root: ~/vdo-ops
-          paths:
-            - << parameters.path >>/dist
-  deploy:
-    description: "Deploy Service"
-    parameters:
-      service:
-        type: string
-      path:
-        type: string
       stage:
         type: string
     steps:
-      - checkout
-      - attach_workspace:
-          at: ~/vdo-ops
       - run:
-          name: Deploy << parameters.service >> to << parameters.stage >> stage
+          name: "Set Stage to << parameters.stage >>"
           command: |
-            if [[ "<< parameters.stage >>"  == "user" ]]; then export STAGE=${CIRCLE_PR_USERNAME:-$CIRCLE_USERNAME}; else export STAGE="<< parameters.stage >>"; fi
-            sh ./scripts/terraform ${STAGE} << parameters.service >> << parameters.path >>
-
-  test:
-    description: "Test Service"
+            case "<< parameters.stage >>" in dev|prod) STAGE="<< parameters.stage >>"; PROFILE_NAME="<< parameters.stage >>";; *) STAGE="$(echo ${CIRCLE_USERNAME} | tr "[A-Z]" "[a-z]")"; PROFILE_NAME="dev";; esac
+            echo "export STAGE=${STAGE}" >> ${BASH_ENV}
+            echo "export PROFILE_NAME=${PROFILE_NAME}" >> ${BASH_ENV}
+            echo "export AWS_PROFILE=vdo-ops" >> ${BASH_ENV}
+            cat ${BASH_ENV}
+            source ${BASH_ENV}
+  aws_auth:
+    description: "Set up aws auth"
     parameters:
-      service:
-        type: string
-      path:
+      stage:
         type: string
     steps:
+      - aws-cli/install
+      - aws-cli/setup:
+          profile-name: vdo-ops
+          aws-access-key-id: AWS_ACCESS_KEY_ID_<< parameters.stage >>
+          aws-secret-access-key: AWS_SECRET_ACCESS_KEY_<< parameters.stage >>
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - .aws/*
+  build_prep:
+    description: "Set up build requirements"
+    parameters:
+      stage:
+        type: string
+    steps:
+      - set_bash_vars:
+          stage: << parameters.stage >>
       - checkout
       - attach_workspace:
-          at: ~/vdo-ops
+          at: ~/
       - run:
-          name: Test << parameters.service >>
-          command: tox -c << parameters.path >>
-
-orbs:
-  aws-cli: circleci/aws-cli@0.1.13
-
+          name: debugging
+          command: cat ~/.aws/credentials
+      - restore_cache:
+          name: restore pip cache
+          keys:
+            - *pip_cache_name
+            - pip-
+      - restore_cache:
+          name: restore pypoetry cache (cache + virtualenv)
+          keys:
+            - *poetry_cache_name
+      - run:
+          name: install poetry deps
+          command: poetry install
+      - run:
+          name: shim pip
+          # aws-sam-translator has a bug in the dependency list. It needs 1.21.0
+          command: poetry run pip install --upgrade aws-sam-translator
+      - run:
+          name: Vsphere SDK python
+          command: poetry run pip install --upgrade git+https://github.com/vmware/vsphere-automation-sdk-python
+      - save_cache:
+          key: *poetry_cache_name
+          paths:
+            - ~/.cache/pypoetry
+            # "pypoetry-" should not be used since "poetry install" won't update virtualenv completely
+      - run:
+          name: generate dependency requirements.txt for lambda layer
+          command: poetry run task generate_lamda_deps_requirement
+      - run:
+          name: build dependency lambda layer
+          command: poetry run task generate_lamda_deps
+      - save_cache:
+          key: *pip_cache_name
+          paths:
+            - ~/.cache/pip
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - project/*
+            - .cache/pypoetry/virtualenvs/*
+      - run:
+          name: Ensure S3 bucket
+          command: poetry run task prep_s3
+      - run:
+          name: Update Secrets in << parameters.stage >>
+          command: poetry run task update_secrets
+  unit_test:
+    description: Run unit tests
+    parameters:
+      stage:
+        type: string
+    steps:
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Run unit tests
+          command: poetry run task unit_tests
+  func_test:
+    description: Run func tests
+    parameters:
+      stage:
+        type: string
+    steps:
+      - attach_workspace:
+          at: ~/
+      - set_bash_vars:
+          stage: << parameters.stage >>
+      - run:
+          name: Run func tests
+          command: poetry run task func_tests
+  unit_coverage_test:
+    description: Run unit tests with coverage
+    parameters:
+      stage:
+        type: string
+    steps:
+      - attach_workspace:
+          at: ~/
+      - restore_cache:
+          keys:
+            - vdo-ops-unit-coverage-
+      - run:
+          name: Generate previous coverage report
+          command: |
+            target=$(poetry run ci-get-last-coverage)
+            echo "export target=${target}" >> $BASH_ENV
+            echo "Previous test coverage percentage: ${target}"
+      - run:
+          name: Run unit tests
+          command: poetry run task unit_tests
+      - run:
+          name: Check coverage percentage
+          command: poetry run task coverage_report
+      - save_cache:
+          paths:
+            - .coverage
+          key: vdo-ops-unit-coverage-{{ checksum ".coverage" }}
+  gate_test:
+    description: All the tests!
+    parameters:
+      stage:
+        type: string
+    steps:
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Run gate tests
+          command: poetry run task gate_tests
+  sam_deploy:
+    description: Deploy vdo ops for stage << parameters.stage >>
+    parameters:
+      stage:
+        type: string
+    steps:
+      - set_bash_vars:
+          stage: << parameters.stage >>
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Create sfns
+          command: poetry run task create_sfns
+      - run:
+          name: Upload sfns to S3
+          command: poetry run task upload_sfns
+      - run:
+          name: Package app
+          command: poetry run task sam_package
+      - run:
+          name: Deploy app
+          command: poetry run task sam_deploy
 jobs:
-  build-network-copy:
-    docker:
-      - image: ryandub/xplat-ci-images:latest
-    working_directory: ~/vdo-ops
+  dev_aws_auth:
+    <<: *deploy_defaults
     steps:
-      - build-lambda:
-          service: network-copy
-          path: ./services/network-copy
-
-  test-network-copy:
-    docker:
-      - image: ryandub/xplat-ci-images:latest
-    working_directory: ~/vdo-ops
+      - aws_auth:
+          stage: DEV
+  prod_aws_auth:
+    <<: *deploy_defaults
     steps:
-      - test:
-          service: network-copy
-          path: ./services/network-copy
-
-  terraform_user:
-    docker:
-      - image: hashicorp/terraform:0.11.14
-    environment:
-      AWS_PROFILE: vdo-ci-dev
-    working_directory: ~/vdo-ops
+      - aws_auth:
+          stage: PROD
+  user_gate_tests:
+    <<: *deploy_defaults
     steps:
-      - checkout
-      - attach_workspace:
-          at: ~/.aws
-      - deploy:
-          service: network-copy
-          path: ./services/network-copy
+      - gate_test:
           stage: user
-
-  terraform_dev: &terraform_dev
-    docker:
-      - image: hashicorp/terraform:0.11.14
-    environment:
-      AWS_PROFILE: vdo-ci-dev
-    working_directory: ~/vdo-ops
+  user_unit_tests:
+    <<: *deploy_defaults
     steps:
-      - checkout
-      - attach_workspace:
-          at: ~/.aws
-      - deploy:
-          service: network-copy
-          path: ./services/network-copy
+      - unit_test:
+          stage: user
+  user_func_tests:
+    <<: *deploy_defaults
+    steps:
+      - func_test:
+          stage: user
+  user_build_prep:
+    <<: *deploy_defaults
+    steps:
+      - build_prep:
+          stage: user
+  user_deploy:
+    <<: *deploy_defaults
+    steps:
+      - sam_deploy:
+          stage: user
+  dev_gate_tests:
+    <<: *deploy_defaults
+    steps:
+      - gate_test:
           stage: dev
-
-  terraform_dev_from_user: *terraform_dev
-
-  terraform_prod:
-    docker:
-      - image: hashicorp/terraform:0.11.14
-    environment:
-      AWS_PROFILE: vdo-ci-prod
-    working_directory: ~/vdo-ops
+  dev_unit_coverage_tests:
+    <<: *deploy_defaults
     steps:
-      - checkout
-      - attach_workspace:
-          at: ~/.aws
-      - deploy:
-          service: network-copy
-          path: ./services/network-copy
+      - unit_coverage_test:
+          stage: dev
+  dev_build_prep:
+    <<: *deploy_defaults
+    steps:
+      - build_prep:
+          stage: dev
+  dev_deploy:
+    <<: *deploy_defaults
+    steps:
+      - sam_deploy:
+          stage: dev
+  prod_functional_tests:
+    <<: *deploy_defaults
+    steps:
+      - unit_coverage_test:
+          stage: prod
+  prod_build_prep:
+    <<: *deploy_defaults
+    steps:
+      - build_prep:
+          stage: prod
+  prod_deploy:
+    <<: *deploy_defaults
+    steps:
+      - sam_deploy:
           stage: prod
 
-  aws_auth:
-    executor: aws-cli/default
-    working_directory: ~/vdo-ops
-    environment:
-      AWS_REGION: us-west-2
-    steps:
-      - checkout
-      - aws-cli/install
-      - aws-cli/configure:
-          profile-name: vdo-ci-dev
-          aws-access-key-id: AWS_ACCESS_KEY_ID_DEV
-          aws-secret-access-key: AWS_SECRET_ACCESS_KEY_DEV
-          aws-region: AWS_REGION
-      - aws-cli/configure:
-          profile-name: vdo-ci-prod
-          aws-access-key-id: AWS_ACCESS_KEY_ID_PROD
-          aws-secret-access-key: AWS_SECRET_ACCESS_KEY_PROD
-          aws-region: AWS_REGION
-      - persist_to_workspace:
-          root: ~/.aws
-          paths:
-            - "*"
-      - run:
-          command: scripts/bootstrap-terraform dev
-          environment:
-            AWS_PROFILE: vdo-ci-dev
-      - run:
-          command: scripts/bootstrap-terraform prod
-          environment:
-            AWS_PROFILE: vdo-ci-prod
-
 workflows:
-  release:
+  release:prod:
     jobs:
-      - test-network-copy:
+      - dev_aws_auth:
           context: vdo
-      - aws_auth:
-          context: vdo
-      - build-network-copy:
-          context: vdo
-      - terraform_user:
-          requires:
-            - aws_auth
-            - test-network-copy
-            - build-network-copy
           filters:
             branches:
-              ignore:
+              only:
                 - master
-
-      - approve_dev_deploy:
+      - dev_build_prep:
+          requires:
+            - dev_aws_auth
+      - dev_gate_tests:
+          requires:
+            - dev_build_prep
+#      - dev_unit_coverage_tests:
+#          requires:
+#            - dev_build_prep
+      - dev_deploy:
+          requires:
+            - dev_gate_tests
+#            - dev_unit_coverage_tests
+      - slack/approval-notification:
+          requires:
+            - dev_deploy
+      - prod_promotion:
           type: approval
           requires:
-            - terraform_user
-          filters:
-            branches:
-              ignore:
-                - master
-
-      - terraform_dev_from_user:
-          requires:
-            - approve_dev_deploy
-          filters:
-            branches:
-              ignore:
-                - master
-
-      - terraform_dev:
-          requires:
-            - aws_auth
-            - test-network-copy
-            - build-network-copy
+            - dev_deploy
+      - prod_aws_auth:
           context: vdo
+          requires:
+            - prod_promotion
+      - prod_build_prep:
+          requires:
+            - prod_aws_auth
           filters:
             branches:
               only:
                 - master
-
-      - terraform_prod:
+#      - prod_functional_tests:
+#          requires:
+#            - prod_build_prep
+      - prod_deploy:
           requires:
-            - aws_auth
-            - build-network-copy
+#            - prod_functional_tests
+# Can delete this line once tests are back
+            - prod_build_prep
+  release:user:
+    jobs:
+      - dev_aws_auth:
           context: vdo
           filters:
             branches:
-              only:
+              ignore:
                 - master
+      - user_build_prep:
+          requires:
+            - dev_aws_auth
+      - user_gate_tests:
+          requires:
+            - user_build_prep
+      - user_unit_tests:
+          requires:
+            - user_build_prep
+      - user_deploy:
+          requires:
+            - user_gate_tests
+            - user_unit_tests
+      - user_func_tests:
+          requires:
+            - user_deploy

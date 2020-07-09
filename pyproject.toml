@@ -1,0 +1,141 @@
+[tool.poetry]
+name = "vdo_ops"
+version = "0.1.0"
+description = ""
+authors = ["chalupaul <me@chalupaul.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+flask-rebar = "^1.11.0"
+python-dotenv = "^0.10.3"
+aws-wsgi = "^0.2.3"
+structlog = "^19.2.0"
+marshmallow-enum = "^1.5.1"
+Flask-DotEnv = "^0.1.2"
+pyvcloud = "^21.0.0"
+pynamodb = "^4.3.1"
+fleece = "^0.18.7"
+PyYAML = "^5.3"
+pyvmomi = "^6.7.3"
+passwordgenerator = "^1.4"
+dacite = "1.2.1"
+defusedxml = "^0.6.0"
+arrow = "^0.15.5"
+paramiko = "^2.7.1"
+
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+flake8 = "^3.7.9"
+black = "^19.10b0"
+bandit = "^1.6.2"
+aws-sam-cli = "^0.43.0"
+awscli = "^1.16.308"
+doit = "^0.32.0"
+cfn-lint = "^0.26.1"
+toml = "^0.10.0"
+coverage = "^5.0.1"
+mock = "^3.0.5"
+taskipy = "^1.1.2"
+Jinja2 = "^2.10.3"
+
+[tool.black]
+line-length = 88
+target_version = ['py36', 'py37', 'py38']
+include = '\.pyi?$'
+exclude = '''
+/(
+  | \.git
+  | .venv
+)/
+'''
+
+[tool.poetry.scripts]
+vdo_opsapi = 'vdo_ops.api.server.handlers:run_app'
+ci-gen-deps = 'util.build_tools:poetry_wrapper'
+ci-distribute-deps = 'util.build_tools:distribute_requirements'
+ci-get-last-coverage = 'util.build_tools:poetry_wrapper_coverage'
+local_pre_deploy_check = 'util.dev_tools:local_pre_deploy_check'
+print_vpc_vars = 'util.build_tools:print_env_vars'
+dev_seeds = 'util.dev_tools:generate_seeds'
+
+[tool.taskipy.tasks]
+prep_s3 = """aws s3api head-bucket \
+  --profile "${AWS_PROFILE}" \
+  --bucket "vdo-ops-${STAGE}" >/dev/null 2>&1 \
+  || aws s3 mb \
+  --profile "${AWS_PROFILE}" \
+  --region "${AWS_DEFAULT_REGION}" \
+  "s3://vdo-ops-${STAGE}" """
+
+generate_lamda_deps_requirement = """mkdir -p ./build && poetry export --without-hashes -f requirements.txt > ./build/lambda-layer-requirements.txt"""
+
+generate_lamda_deps = """pip install --disable-pip-version-check -r ./build/lambda-layer-requirements.txt -t ./build/dependencies/python/lib/python3.8/site-packages"""
+
+# we need the linux version of dependencies
+generate_lamda_deps_using_docker = """docker run \
+      --rm \
+      --mount type=volume,source=vdo-ops-pip-cache,target=/root/.cache/pip \
+      --mount type=bind,source="$(pwd)"/build,target=/root/project/build \
+      -w=/root/project \
+      chalupaul/sambuild:latest \
+      pip install --disable-pip-version-check -r ./build/lambda-layer-requirements.txt -t ./build/dependencies/python/lib/python3.8/site-packages
+"""
+
+clean = """rm -rf ./build"""
+
+unit_tests = """coverage run -m --branch --omit='*/virtualenvs/*,*/tests/*' --source ./vdo_ops pytest -vv --ignore=./vdo_ops/tests/e2e_tests/ --ignore=./vdo_ops/tests/func_tests ./vdo_ops/tests/ && coverage report -m"""
+
+func_tests = """pytest -vv ./vdo_ops/tests/func_tests/"""
+
+e2e_tests = """pytest -vv ./vdo_ops/tests/e2e_tests/"""
+
+coverage_report = """coverage report -m --fail-under="${target}" """
+
+gate_tests = """doit -n 4 -f ./util/gate_tests.py"""
+
+sam_package = """sam package \
+  --template-file ./sam/main.yaml \
+  --s3-bucket "vdo-ops-${STAGE}" \
+  --s3-prefix "${STAGE}" \
+  --profile "${AWS_PROFILE}" \
+  --region "${AWS_DEFAULT_REGION}" \
+  --output-template-file ./build/packaged.yaml"""
+
+sam_deploy = """$(poetry run print_vpc_vars) && \
+  sam deploy \
+  --stack-name "vdo-ops-api-${STAGE}" \
+  --s3-prefix "${STAGE}" \
+  --s3-bucket "vdo-ops-${STAGE}" \
+  --profile "${AWS_PROFILE}" \
+  --region "${AWS_DEFAULT_REGION}" \
+  --capabilities CAPABILITY_AUTO_EXPAND CAPABILITY_NAMED_IAM CAPABILITY_IAM \
+  --parameter-overrides "Stage=${STAGE} SecurityGroupId=${SecurityGroupId} SubnetId1=${SubnetId1} SubnetId2=${SubnetId2}" \
+  --no-fail-on-empty-changeset \
+  --template ./build/packaged.yaml"""
+
+update_secrets = """sops -d ./vdo_ops/_vault/${PROFILE_NAME}.secrets.yaml | python ./util/create_secrets.py - -r "${AWS_DEFAULT_REGION}" -s "${STAGE}" -p "${AWS_PROFILE}" && \
+    sops -d ./vdo_ops/_vault/license.secrets.yaml | python ./util/create_secrets.py - -r "${AWS_DEFAULT_REGION}" -s "${STAGE}" -p "${AWS_PROFILE}" """
+
+create_sfns = """python ./util/create_sam_sfns.py -d build/sfns ./vdo_ops/managers/*/*.yaml"""
+upload_sfns= """python ./util/upload_sam_sfns.py -r "${AWS_DEFAULT_REGION}" -s "${STAGE}" -p "${AWS_PROFILE}" build/sfns"""
+
+deploy_sfns = """poetry run task create_sfns && poetry run task upload_sfns"""
+
+local_deploy = """poetry run task clean && \
+                poetry run local_pre_deploy_check && \
+                poetry run task prep_s3 && \
+                poetry run task create_sfns && \
+                poetry run task upload_sfns && \
+                poetry run task generate_lamda_deps_requirement && \
+                poetry run task generate_lamda_deps_using_docker && \
+                poetry run task sam_package && \
+                poetry run task sam_deploy && \
+                poetry run task update_secrets"""
+
+[pytest]
+junit_family = "legacy"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"

@@ -1,0 +1,49 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: "AWS::Serverless-2016-10-31"
+
+Parameters:
+  Stage:
+    Type: String
+    Default: dev
+  LayerArn:
+    Type: String
+  SecurityGroupId:
+    Type: String
+  SubnetId1:
+    Type: String
+  SubnetId2:
+    Type: String
+
+Globals:
+  Function:
+    Runtime: python3.8
+    Tracing: Active
+    MemorySize: 256
+    Timeout: 30
+    Layers:
+      - !Ref LayerArn
+    VpcConfig:
+      SecurityGroupIds:
+        - !Ref SecurityGroupId
+      SubnetIds:
+        - !Ref SubnetId1
+        - !Ref SubnetId2
+    Environment:
+      Variables:
+        STAGE: !Ref Stage
+        REGION: !Ref "AWS::Region"
+
+Conditions:
+  IsProdStage: !Equals [ !Ref Stage, "prod"]
+
+Resources:
+  # Network Copy Manager
+  OrgManagerLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${Stage}-vdo-ops-network_copy"
+      CodeUri: ../vdo_ops/managers/network_copy/
+      Handler: network_copy.handler
+      Policies:
+        - SSMParameterReadPolicy:
+            ParameterName: !Sub "vdo-ops/${Stage}/*"

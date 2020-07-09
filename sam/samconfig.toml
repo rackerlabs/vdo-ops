@@ -1,0 +1,11 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "vdo-ops-api"
+s3_bucket = "vdo-ops-api"
+s3_prefix = "vdo-ops-api"
+region = "us-west-2"
+confirm_changeset = false
+capabilities = "CAPABILITY_NAMED_IAM"
+parameter_overrides = "Stage=dev"
