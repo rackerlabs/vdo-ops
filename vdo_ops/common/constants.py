@@ -13,6 +13,7 @@ STAGE = os.environ.get("STAGE", "dev")
 REGION = os.environ.get("REGION", "us-west-2")
 SNAT = "snat"
 DNAT = "dnat"
+os.environ.setdefault("APP_LOCATION", "local")
 
 DEPLOY_APPLIANCE_JOB_DEFINITION_NAME = "deploy-appliance-batch-job-definition"
 JOB_QUEUE_NAME = "batch-processing-job-queue"

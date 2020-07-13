@@ -29,6 +29,14 @@ class Zamboni:
             "body.guest",
         ]
 
+        self.host_fields = [
+            "id",  # This fixes a pagination bug in Zamboni
+            "location",
+            "resource_id",
+            "body.name",
+            "body._rackspace",
+        ]
+
         self.services_list = [
             ("com.rackspace.goss.vm.services.os.admin", 1),
             ("com.rackspace.goss.vm.services.monitoring", 2),
@@ -103,3 +111,34 @@ class Zamboni:
         self._apply_org_to_metadata(data)
 
         return data
+
+    def get_hyps_by_device_id(self, device_id: str) -> Optional[List[Dict[str, Any]]]:
+        """
+        https://resources.rackspace.net/docs#tag/managedvirt/paths/~1managedvirt~1vsphere~1host_systems/get
+        Note: This call only get managed virt hypervisors.
+        (It is likely that they are the only ones with a device ID)
+        """
+        with IdentitySession(self.__identity_account) as session:
+            response = session.get(
+                f"{self.__endpoint}/managedvirt/vsphere/host_systems",
+                params={
+                    "filters[body._rackspace.deviceId]": device_id,
+                    "fields": ",".join(self.host_fields),
+                },
+            )
+
+        if response.status_code == 404:
+            return None
+        response.raise_for_status()
+
+        # Get the data
+        data = response.json().get("data", [])  # type: List[Dict[str, Any]]
+
+        if len(data) == 1:
+            return data[0]
+        elif len(data) > 1:
+            raise Exception(
+                f"More than one Hypervisor with device ID {device_id} found"
+            )
+        else:
+            return None
