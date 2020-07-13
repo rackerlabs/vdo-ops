@@ -1,0 +1,25 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: "AWS::Serverless-2016-10-31"
+
+Parameters:
+  Stage:
+    Type: String
+    Default: dev
+
+Outputs:
+  PythonDepLayer:
+    Description: "Lambda Layer Arn"
+    Value: !Ref VdoOpsDependencyLayer
+
+Resources:
+  VdoOpsDependencyLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: !Join
+        - "-"
+        - - !Ref Stage
+          - "vdo-ops-deps"
+      CompatibleRuntimes:
+        - python3.8
+      ContentUri: ../build/dependencies
+      RetentionPolicy: Delete

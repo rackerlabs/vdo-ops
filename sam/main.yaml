@@ -1,0 +1,31 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: "AWS::Serverless-2016-10-31"
+
+Parameters:
+  Stage:
+    Type: String
+    Default: dev
+  SecurityGroupId:
+    Type: String
+  SubnetId1:
+    Type: String
+  SubnetId2:
+    Type: String
+Resources:
+  LambdaLayers:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: ./lambdalayer.yaml
+      Parameters:
+        Stage: !Ref Stage
+
+  VdoOpsManagers:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: ./managers.yaml
+      Parameters:
+        Stage: !Ref Stage
+        LayerArn: !GetAtt LambdaLayers.Outputs.PythonDepLayer
+        SecurityGroupId: !Ref SecurityGroupId
+        SubnetId1: !Ref SubnetId1
+        SubnetId2: !Ref SubnetId2

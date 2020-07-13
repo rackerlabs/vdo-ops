@@ -1,0 +1,13 @@
+creation_rules:
+  - path_regex: /_vault/dev.secrets.yaml
+    key_groups:
+    - kms:
+      - arn: arn:aws:kms:us-west-2:816569674899:alias/vdo/rpcv/api/dev
+  - path_regex: /_vault/prod.secrets.yaml
+    key_groups:
+    - kms:
+      - arn: arn:aws:kms:us-east-2:665846930766:alias/vdo/rpcv/api/prod
+  - path_regex: /_vault/license.secrets.yaml
+    key_groups:
+    - kms:
+      - arn: arn:aws:kms:us-east-2:665846930766:alias/vdo/rpcv/license
