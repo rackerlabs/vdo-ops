@@ -11,6 +11,15 @@ Parameters:
     Type: String
   SubnetId2:
     Type: String
+
+Outputs:
+  ApiEndpoint:
+    Description: "API Endpoint"
+    Value: !GetAtt VdoOpsApiService.Outputs.ApiEndpoint
+  CustomDomain:
+    Description: "Stage Specific Custom Domain Endpoint"
+    Value: !GetAtt VdoOpsApiService.Outputs.CustomDomain
+
 Resources:
   LambdaLayers:
     Type: AWS::Serverless::Application
@@ -18,6 +27,17 @@ Resources:
       Location: ./lambdalayer.yaml
       Parameters:
         Stage: !Ref Stage
+
+  VdoOpsApiService:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: ./api.yaml
+      Parameters:
+        Stage: !Ref Stage
+        LayerArn: !GetAtt LambdaLayers.Outputs.PythonDepLayer
+        SecurityGroupId: !Ref SecurityGroupId
+        SubnetId1: !Ref SubnetId1
+        SubnetId2: !Ref SubnetId2
 
   VdoOpsManagers:
     Type: AWS::Serverless::Application

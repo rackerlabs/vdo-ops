@@ -1,0 +1,140 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: "AWS::Serverless-2016-10-31"
+
+Parameters:
+  Stage:
+    Type: String
+    Default: dev
+  LayerArn:
+    Type: String
+  SecurityGroupId:
+    Type: String
+  SubnetId1:
+    Type: String
+  SubnetId2:
+    Type: String
+
+Globals:
+  Function:
+    Runtime: python3.8
+    Tracing: Active
+    MemorySize: 256
+    Timeout: 20
+    Layers:
+      - !Ref LayerArn
+    VpcConfig:
+      SecurityGroupIds:
+        - !Ref SecurityGroupId
+      SubnetIds:
+        - !Ref SubnetId1
+        - !Ref SubnetId2
+    Environment:
+      Variables:
+        STAGE: !Ref Stage
+        REGION: !Ref "AWS::Region"
+
+Conditions:
+  IsNotUserStage: !Or
+    - !Equals [ !Ref Stage, "dev" ]
+    - !Equals [ !Ref Stage, "prod" ]
+  IsProdStage: !Equals [ !Ref Stage, "prod"]
+
+Outputs:
+  ApiEndpoint:
+    Description: "Stage Specific API Endpoint"
+    Value: !Sub "https://${VdoOpsApiGateway}.execute-api.${AWS::Region}.amazonaws.com/${Stage}/"
+  CustomDomain:
+    Description: "Stage Custom Domain"
+    Value: !Sub "https://${VdoOpsApiGateway.DomainName}/api"
+
+Resources:
+  VdoOpsApiGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: !Ref Stage
+      MinimumCompressionSize: 1024
+      Auth:
+        DefaultAuthorizer: VdoOpsAuthorizer
+        Authorizers:
+          VdoOpsAuthorizer:
+            FunctionArn: !GetAtt VdoOpsLambdaAuthorizer.Arn
+            FunctionPayloadType: REQUEST
+            Identity:
+              Headers:
+                - X-Auth-Token
+              ReauthorizeEvery: 0
+      GatewayResponses:
+        ACCESS_DENIED:
+          ResponseTemplates:
+            application/json: '{"message":"$context.authorizer.errorMessage"}'
+          StatusCode: '403'
+      Domain:
+        DomainName: !If
+          - IsProdStage
+          - "api.ops.vdo-cloud.rackspace-cloud.com"
+          - !If
+              - IsNotUserStage
+              - "api.ops.dev.vdo-cloud.rackspace-cloud.com"
+              - !Sub "${Stage}-api.ops.dev.vdo-cloud.rackspace-cloud.com"
+        CertificateArn: !If
+          - IsProdStage
+          - "arn:aws:acm:us-east-1:665846930766:certificate/5ec4b8fa-a4c3-4076-8839-b5cd265ee00a"
+          - "arn:aws:acm:us-east-1:816569674899:certificate/dcc4d611-6c46-4a0a-bb2d-e627b40700aa"
+        EndpointConfiguration: EDGE
+        BasePath:
+          - !Sub "/${Stage}"
+        Route53:
+          HostedZoneId: !If
+            - IsProdStage
+            - "ZEYBGRTRNB3QH"
+            - "Z248V9M73H3CKN"
+          IpV6: true
+
+  VdoOpsApiLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${Stage}-vdo-ops-api"
+      CodeUri: ../vdo_ops/api/
+      Handler: server.handlers.handler
+      Policies:
+        - SSMParameterReadPolicy:
+            ParameterName: !Sub "vdo-ops/${Stage}/*"
+        - StepFunctionsExecutionPolicy:
+            StateMachineName: "*"
+        - LambdaInvokePolicy:
+            FunctionName: "*"
+        - AWSStepFunctionsReadOnlyAccess
+        - Statement:
+            - Effect: "Allow"
+              Action:
+                - "ssm:PutParameter"
+              Resource: !Sub 'arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/vdo-ops/${Stage}/*'
+        - Version: '2012-10-17' # Policy Document
+          Statement:
+            - Effect: "Allow"
+              Action:
+                - "secretsmanager:CreateSecret"
+                - "secretsmanager:UpdateSecret"
+                - "secretsmanager:GetSecretValue"
+                - "secretsmanager:ListSecrets"
+              Resource: "*"
+      Events:
+        proxyroot:
+          Type: Api
+          Properties:
+            Path: /
+            Method: ANY
+            RestApiId: !Ref VdoOpsApiGateway
+        proxypass:
+          Type: Api
+          Properties:
+            Path: /{proxy+}
+            Method: ANY
+            RestApiId: !Ref VdoOpsApiGateway
+
+  VdoOpsLambdaAuthorizer:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${Stage}-vdo-ops-authorizer"
+      CodeUri: ../vdo_ops/api_authorizer/
+      Handler: authorizer.handler
