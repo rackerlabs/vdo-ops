@@ -5,7 +5,6 @@ from typing import List
 
 from common.clients.cms import Cms
 from common.clients.zamboni import Zamboni
-from common.clients.vdo_goss import VdoGoss
 from common import secrets
 from common.clients.identity import IdentityAccount
 
@@ -13,6 +12,7 @@ STAGE = os.environ.get("STAGE", "dev")
 REGION = os.environ.get("REGION", "us-west-2")
 SNAT = "snat"
 DNAT = "dnat"
+os.environ.setdefault("APP_LOCATION", "local")
 
 DEPLOY_APPLIANCE_JOB_DEFINITION_NAME = "deploy-appliance-batch-job-definition"
 JOB_QUEUE_NAME = "batch-processing-job-queue"
@@ -108,10 +108,6 @@ class Clients:
     @cached_property
     def zamboni_client(self) -> Zamboni:
         return Zamboni(ZAMBONI_URL, getattr(IDENTITY_USERS, ZAMBONI_IDENTITY_USER))
-
-    @cached_property
-    def vdo_goss_client(self) -> VdoGoss:
-        return VdoGoss(VDO_URL, getattr(IDENTITY_USERS, VDO_IDENTITY_USER))
 
 
 CLIENTS = Clients()

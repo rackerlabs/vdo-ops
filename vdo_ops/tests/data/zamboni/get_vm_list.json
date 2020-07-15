@@ -1,0 +1,1291 @@
+{
+  "meta": {
+    "page_size": 500,
+    "current_page": 1,
+    "last_page": true,
+    "next_page": null,
+    "prev_page": null,
+    "next_token": null
+  },
+  "data": [
+    {
+      "name": "Hounsou-Test-2012-Std",
+      "location": "vcenter2.chalupaul.com",
+      "provider_account_id": "c398934c-1064-4df5-846b-611fd9256e7c",
+      "id": "00afb8e2-b83f-41b4-a1df-ffc66ff3fc47",
+      "_rackspace": null,
+      "_metadata": {
+        "sddcId": "ff1a7744-750b-44dc-9931-29830371c448"
+      },
+      "availableField": [
+        {
+          "key": 131,
+          "name": "Backup Status",
+          "type": "string",
+          "managedObjectType": "VirtualMachine"
+        },
+        {
+          "key": 119,
+          "name": "Last Backup",
+          "type": "string",
+          "managedObjectType": "VirtualMachine"
+        },
+        {
+          "key": 117,
+          "name": "com.rackspace.deviceId",
+          "type": "string"
+        },
+        {
+          "key": 132,
+          "name": "com.rackspace.goss.vm.os_type",
+          "type": "string",
+          "managedObjectType": "VirtualMachine"
+        },
+        {
+          "key": 136,
+          "name": "com.rackspace.goss.vm.services.monitoring",
+          "type": "string",
+          "managedObjectType": "VirtualMachine"
+        },
+        {
+          "key": 134,
+          "name": "com.rackspace.goss.vm.services.os.admin",
+          "type": "string",
+          "managedObjectType": "VirtualMachine"
+        },
+        {
+          "key": 135,
+          "name": "com.rackspace.goss.vm.services.patching",
+          "type": "string",
+          "managedObjectType": "VirtualMachine"
+        },
+        {
+          "key": 133,
+          "name": "com.rackspace.goss.vm.ssmid",
+          "type": "string",
+          "managedObjectType": "VirtualMachine"
+        },
+        {
+          "key": 129,
+          "name": "com.rackspace.rpcv.goss",
+          "type": "string"
+        },
+        {
+          "key": 130,
+          "name": "com.rackspace.rpcv.goss.ipAllocationDevice",
+          "type": "string"
+        },
+        {
+          "key": 116,
+          "name": "com.rackspace.rpcv.goss.services.antivirus",
+          "type": "string"
+        },
+        {
+          "key": 115,
+          "name": "com.rackspace.rpcv.goss.services.monitoring",
+          "type": "string"
+        },
+        {
+          "key": 114,
+          "name": "com.rackspace.rpcv.goss.services.patching",
+          "type": "string"
+        },
+        {
+          "key": 122,
+          "name": "com.rackspace.rpcv.goss.vm.services.antivirus",
+          "type": "string"
+        },
+        {
+          "key": 120,
+          "name": "com.rackspace.rpcv.goss.vm.services.monitoring",
+          "type": "string"
+        },
+        {
+          "key": 118,
+          "name": "com.rackspace.rpcv.goss.vm.services.os.admin",
+          "type": "string"
+        },
+        {
+          "key": 121,
+          "name": "com.rackspace.rpcv.goss.vm.services.patching",
+          "type": "string"
+        }
+      ],
+      "value": [
+        {
+          "key": 117,
+          "value": "1098922"
+        },
+        {
+          "key": 119,
+          "value": "6/12/2020 12:27:09 AM"
+        },
+        {
+          "key": 131,
+          "value": "Backup Job ID [13283890]  Client: [5050906-984435], Backup Set: [defaultBackupSet], Subclient: [vCenter-Compute]"
+        }
+      ],
+      "config$instanceUuid": "503fcf32-471c-c6c2-6e0d-e8024987079f",
+      "config$uuid": "423ffa50-6e29-10f2-339c-0d96e12d51f3",
+      "guest": {
+        "net": [
+          {
+            "network": "ExNet-Inside-VLAN-1051",
+            "ipConfig": {
+              "dhcp": {
+                "ipv4": {
+                  "enable": false
+                },
+                "ipv6": {
+                  "enable": true
+                }
+              },
+              "ipAddress": [
+                {
+                  "state": "unknown",
+                  "origin": "linklayer",
+                  "ipAddress": "fe80::251a:d23b:d61e:f2d4",
+                  "prefixLength": 64
+                },
+                {
+                  "state": "preferred",
+                  "origin": "manual",
+                  "ipAddress": "172.20.64.52",
+                  "prefixLength": 24
+                }
+              ]
+            },
+            "connected": true,
+            "dnsConfig": {
+              "dhcp": false,
+              "hostName": null,
+              "ipAddress": [
+                "fec0:0:0:ffff::1",
+                "fec0:0:0:ffff::2",
+                "fec0:0:0:ffff::3"
+              ],
+              "domainName": null
+            },
+            "ipAddress": [
+              "fe80::251a:d23b:d61e:f2d4",
+              "172.20.64.52"
+            ],
+            "macAddress": "00:50:56:bf:53:29",
+            "deviceConfigId": 4000
+          }
+        ],
+        "disk": [
+          {
+            "capacity": "34357637120",
+            "diskPath": "C:\\",
+            "freeSpace": "21304832000"
+          }
+        ],
+        "guestId": "windows8Server64Guest",
+        "ipStack": [
+          {
+            "dnsConfig": {
+              "dhcp": false,
+              "hostName": "WIN-D48QP4A1HRS",
+              "ipAddress": [
+                "fec0:0:0:ffff::1",
+                "fec0:0:0:ffff::2",
+                "fec0:0:0:ffff::3"
+              ],
+              "domainName": null
+            },
+            "ipRouteConfig": {
+              "ipRoute": [
+                {
+                  "gateway": {
+                    "device": "0",
+                    "ipAddress": "172.20.64.1"
+                  },
+                  "network": "0.0.0.0",
+                  "prefixLength": 0
+                },
+                {
+                  "gateway": {
+                    "device": "0"
+                  },
+                  "network": "172.20.64.0",
+                  "prefixLength": 24
+                },
+                {
+                  "gateway": {
+                    "device": "0"
+                  },
+                  "network": "172.20.64.52",
+                  "prefixLength": 32
+                },
+                {
+                  "gateway": {
+                    "device": "0"
+                  },
+                  "network": "172.20.64.255",
+                  "prefixLength": 32
+                },
+                {
+                  "gateway": {
+                    "device": "0"
+                  },
+                  "network": "224.0.0.0",
+                  "prefixLength": 4
+                },
+                {
+                  "gateway": {
+                    "device": "0"
+                  },
+                  "network": "255.255.255.255",
+                  "prefixLength": 32
+                },
+                {
+                  "gateway": {
+                    "device": "0"
+                  },
+                  "network": "fe80::",
+                  "prefixLength": 64
+                },
+                {
+                  "gateway": {
+                    "device": "0"
+                  },
+                  "network": "fe80::251a:d23b:d61e:f2d4",
+                  "prefixLength": 128
+                },
+                {
+                  "gateway": {
+                    "device": "0"
+                  },
+                  "network": "ff00::",
+                  "prefixLength": 8
+                }
+              ]
+            }
+          }
+        ],
+        "hostName": "WIN-D48QP4A1HRS",
+        "ipAddress": "172.20.64.52",
+        "guestState": "running",
+        "guestFamily": "windowsGuest",
+        "toolsStatus": "toolsOk",
+        "toolsVersion": "11269",
+        "guestFullName": "Microsoft Windows Server 2012 (64-bit)",
+        "toolsRunningStatus": "guestToolsRunning",
+        "toolsVersionStatus": "guestToolsCurrent",
+        "toolsVersionStatus2": "guestToolsSupportedNew",
+        "guestOperationsReady": true,
+        "interactiveGuestOperationsReady": false
+      }
+    },
+    {
+      "name": "Hounsou-Test-2008-Standard",
+      "location": "vcenter2.chalupaul.com",
+      "provider_account_id": "c398934c-1064-4df5-846b-611fd9256e7c",
+      "id": "05e8863c-0f9d-4dab-8d26-0c7b7dad3ac7",
+      "_rackspace": null,
+      "_metadata": {
+        "sddcId": "ff1a7744-750b-44dc-9931-29830371c448"
+      },
+      "availableField": [
+        {
+          "key": 131,
+          "name": "Backup Status",
+          "type": "string",
+          "managedObjectType": "VirtualMachine"
+        },
+        {
+          "key": 119,
+          "name": "Last Backup",
+          "type": "string",
+          "managedObjectType": "VirtualMachine"
+        },
+        {
+          "key": 117,
+          "name": "com.rackspace.deviceId",
+          "type": "string"
+        },
+        {
+          "key": 132,
+          "name": "com.rackspace.goss.vm.os_type",
+          "type": "string",
+          "managedObjectType": "VirtualMachine"
+        },
+        {
+          "key": 136,
+          "name": "com.rackspace.goss.vm.services.monitoring",
+          "type": "string",
+          "managedObjectType": "VirtualMachine"
+        },
+        {
+          "key": 134,
+          "name": "com.rackspace.goss.vm.services.os.admin",
+          "type": "string",
+          "managedObjectType": "VirtualMachine"
+        },
+        {
+          "key": 135,
+          "name": "com.rackspace.goss.vm.services.patching",
+          "type": "string",
+          "managedObjectType": "VirtualMachine"
+        },
+        {
+          "key": 133,
+          "name": "com.rackspace.goss.vm.ssmid",
+          "type": "string",
+          "managedObjectType": "VirtualMachine"
+        },
+        {
+          "key": 129,
+          "name": "com.rackspace.rpcv.goss",
+          "type": "string"
+        },
+        {
+          "key": 130,
+          "name": "com.rackspace.rpcv.goss.ipAllocationDevice",
+          "type": "string"
+        },
+        {
+          "key": 116,
+          "name": "com.rackspace.rpcv.goss.services.antivirus",
+          "type": "string"
+        },
+        {
+          "key": 115,
+          "name": "com.rackspace.rpcv.goss.services.monitoring",
+          "type": "string"
+        },
+        {
+          "key": 114,
+          "name": "com.rackspace.rpcv.goss.services.patching",
+          "type": "string"
+        },
+        {
+          "key": 122,
+          "name": "com.rackspace.rpcv.goss.vm.services.antivirus",
+          "type": "string"
+        },
+        {
+          "key": 120,
+          "name": "com.rackspace.rpcv.goss.vm.services.monitoring",
+          "type": "string"
+        },
+        {
+          "key": 118,
+          "name": "com.rackspace.rpcv.goss.vm.services.os.admin",
+          "type": "string"
+        },
+        {
+          "key": 121,
+          "name": "com.rackspace.rpcv.goss.vm.services.patching",
+          "type": "string"
+        }
+      ],
+      "value": [
+        {
+          "key": 117,
+          "value": "1099347"
+        },
+        {
+          "key": 119,
+          "value": "6/12/2020 12:23:02 AM"
+        },
+        {
+          "key": 131,
+          "value": "Backup Job ID [13283890]  Client: [5050906-984435], Backup Set: [defaultBackupSet], Subclient: [vCenter-Compute]"
+        }
+      ],
+      "config$instanceUuid": "503f0944-8194-c302-501b-7a8c4353efa6",
+      "config$uuid": "423f9ba2-499c-3836-8e50-863b54550c80",
+      "guest": {
+        "net": [
+          {
+            "network": "ExNet-Inside-VLAN-1051",
+            "ipConfig": {
+              "dhcp": {
+                "ipv4": {
+                  "enable": false
+                },
+                "ipv6": {
+                  "enable": true
+                }
+              },
+              "ipAddress": [
+                {
+                  "state": "unknown",
+                  "origin": "linklayer",
+                  "ipAddress": "fe80::a847:3631:26bf:4064",
+                  "prefixLength": 64
+                },
+                {
+                  "state": "preferred",
+                  "origin": "manual",
+                  "ipAddress": "172.20.64.57",
+                  "prefixLength": 24
+                }
+              ]
+            },
+            "connected": true,
+            "dnsConfig": {
+              "dhcp": false,
+              "hostName": null,
+              "ipAddress": [
+                "fec0:0:0:ffff::1",
+                "fec0:0:0:ffff::2",
+                "fec0:0:0:ffff::3"
+              ],
+              "domainName": null
+            },
+            "ipAddress": [
+              "fe80::a847:3631:26bf:4064",
+              "172.20.64.57"
+            ],
+            "macAddress": "00:50:56:bf:96:bd",
+            "deviceConfigId": 4000
+          }
+        ],
+        "disk": [
+          {
+            "capacity": "42947571712",
+            "diskPath": "C:\\",
+            "freeSpace": "29211238400"
+          }
+        ],
+        "guestId": "winLonghorn64Guest",
+        "ipStack": [
+          {
+            "dnsConfig": {
+              "dhcp": false,
+              "hostName": "WIN-WQ167XS6FHI",
+              "ipAddress": [
+                "fec0:0:0:ffff::1",
+                "fec0:0:0:ffff::2",
+                "fec0:0:0:ffff::3"
+              ],
+              "domainName": null
+            },
+            "ipRouteConfig": {
+              "ipRoute": [
+                {
+                  "gateway": {
+                    "device": "0",
+                    "ipAddress": "172.20.64.1"
+                  },
+                  "network": "0.0.0.0",
+                  "prefixLength": 0
+                },
+                {
+                  "gateway": {
+                    "device": "0"
+                  },
+                  "network": "172.20.64.0",
+                  "prefixLength": 24
+                },
+                {
+                  "gateway": {
+                    "device": "0"
+                  },
+                  "network": "172.20.64.57",
+                  "prefixLength": 32
+                },
+                {
+                  "gateway": {
+                    "device": "0"
+                  },
+                  "network": "172.20.64.255",
+                  "prefixLength": 32
+                },
+                {
+                  "gateway": {
+                    "device": "0"
+                  },
+                  "network": "224.0.0.0",
+                  "prefixLength": 4
+                },
+                {
+                  "gateway": {
+                    "device": "0"
+                  },
+                  "network": "255.255.255.255",
+                  "prefixLength": 32
+                },
+                {
+                  "gateway": {
+                    "device": "0"
+                  },
+                  "network": "fe80::",
+                  "prefixLength": 64
+                },
+                {
+                  "gateway": {
+                    "device": "0"
+                  },
+                  "network": "fe80::a847:3631:26bf:4064",
+                  "prefixLength": 128
+                },
+                {
+                  "gateway": {
+                    "device": "0"
+                  },
+                  "network": "ff00::",
+                  "prefixLength": 8
+                }
+              ]
+            }
+          }
+        ],
+        "hostName": "WIN-WQ167XS6FHI",
+        "ipAddress": "172.20.64.57",
+        "guestState": "running",
+        "guestFamily": "windowsGuest",
+        "toolsStatus": "toolsOk",
+        "toolsVersion": "11269",
+        "guestFullName": "Microsoft Windows Server 2008 (64-bit)",
+        "toolsRunningStatus": "guestToolsRunning",
+        "toolsVersionStatus": "guestToolsCurrent",
+        "toolsVersionStatus2": "guestToolsSupportedNew",
+        "guestOperationsReady": true,
+        "interactiveGuestOperationsReady": true
+      }
+    },
+    {
+      "name": "Hounsou-Test-2012-R2-DC",
+      "location": "vcenter2.chalupaul.com",
+      "provider_account_id": "c398934c-1064-4df5-846b-611fd9256e7c",
+      "id": "37d2101e-f4bb-49d9-8264-50cd9fc3e383",
+      "_rackspace": null,
+      "_metadata": {
+        "sddcId": "ff1a7744-750b-44dc-9931-29830371c448"
+      },
+      "availableField": [
+        {
+          "key": 131,
+          "name": "Backup Status",
+          "type": "string",
+          "managedObjectType": "VirtualMachine"
+        },
+        {
+          "key": 119,
+          "name": "Last Backup",
+          "type": "string",
+          "managedObjectType": "VirtualMachine"
+        },
+        {
+          "key": 117,
+          "name": "com.rackspace.deviceId",
+          "type": "string"
+        },
+        {
+          "key": 132,
+          "name": "com.rackspace.goss.vm.os_type",
+          "type": "string",
+          "managedObjectType": "VirtualMachine"
+        },
+        {
+          "key": 136,
+          "name": "com.rackspace.goss.vm.services.monitoring",
+          "type": "string",
+          "managedObjectType": "VirtualMachine"
+        },
+        {
+          "key": 134,
+          "name": "com.rackspace.goss.vm.services.os.admin",
+          "type": "string",
+          "managedObjectType": "VirtualMachine"
+        },
+        {
+          "key": 135,
+          "name": "com.rackspace.goss.vm.services.patching",
+          "type": "string",
+          "managedObjectType": "VirtualMachine"
+        },
+        {
+          "key": 133,
+          "name": "com.rackspace.goss.vm.ssmid",
+          "type": "string",
+          "managedObjectType": "VirtualMachine"
+        },
+        {
+          "key": 129,
+          "name": "com.rackspace.rpcv.goss",
+          "type": "string"
+        },
+        {
+          "key": 130,
+          "name": "com.rackspace.rpcv.goss.ipAllocationDevice",
+          "type": "string"
+        },
+        {
+          "key": 116,
+          "name": "com.rackspace.rpcv.goss.services.antivirus",
+          "type": "string"
+        },
+        {
+          "key": 115,
+          "name": "com.rackspace.rpcv.goss.services.monitoring",
+          "type": "string"
+        },
+        {
+          "key": 114,
+          "name": "com.rackspace.rpcv.goss.services.patching",
+          "type": "string"
+        },
+        {
+          "key": 122,
+          "name": "com.rackspace.rpcv.goss.vm.services.antivirus",
+          "type": "string"
+        },
+        {
+          "key": 120,
+          "name": "com.rackspace.rpcv.goss.vm.services.monitoring",
+          "type": "string"
+        },
+        {
+          "key": 118,
+          "name": "com.rackspace.rpcv.goss.vm.services.os.admin",
+          "type": "string"
+        },
+        {
+          "key": 121,
+          "name": "com.rackspace.rpcv.goss.vm.services.patching",
+          "type": "string"
+        }
+      ],
+      "value": [
+        {
+          "key": 117,
+          "value": "1098920"
+        },
+        {
+          "key": 119,
+          "value": "6/12/2020 12:36:44 AM"
+        },
+        {
+          "key": 131,
+          "value": "Backup Job ID [13283890]  Client: [5050906-984435], Backup Set: [defaultBackupSet], Subclient: [vCenter-Compute]"
+        }
+      ],
+      "config$instanceUuid": "503fa983-f4cc-4649-800f-71c01f3ce2b6",
+      "config$uuid": "423f757e-3f9c-f1ff-3f68-8a53c040f95f",
+      "guest": {
+        "net": [
+          {
+            "network": "ExNet-Inside-VLAN-1051",
+            "ipConfig": {
+              "dhcp": {
+                "ipv4": {
+                  "enable": false
+                },
+                "ipv6": {
+                  "enable": false
+                }
+              },
+              "ipAddress": [
+                {
+                  "state": "unknown",
+                  "origin": "linklayer",
+                  "ipAddress": "fe80::29a2:351f:6f8:aceb",
+                  "prefixLength": 64
+                },
+                {
+                  "state": "preferred",
+                  "origin": "manual",
+                  "ipAddress": "172.20.64.54",
+                  "prefixLength": 24
+                }
+              ]
+            },
+            "connected": true,
+            "dnsConfig": {
+              "dhcp": false,
+              "hostName": null,
+              "ipAddress": [
+                "fec0:0:0:ffff::1",
+                "fec0:0:0:ffff::2",
+                "fec0:0:0:ffff::3"
+              ],
+              "domainName": null
+            },
+            "ipAddress": [
+              "fe80::29a2:351f:6f8:aceb",
+              "172.20.64.54"
+            ],
+            "macAddress": "00:50:56:bf:4b:ba",
+            "deviceConfigId": 4000
+          }
+        ],
+        "disk": [
+          {
+            "capacity": "34357637120",
+            "diskPath": "C:\\",
+            "freeSpace": "24079167488"
+          }
+        ],
+        "guestId": "windows8Server64Guest",
+        "ipStack": [
+          {
+            "dnsConfig": {
+              "dhcp": false,
+              "hostName": "WIN-0JL9PTQS2LQ",
+              "ipAddress": [
+                "fec0:0:0:ffff::1",
+                "fec0:0:0:ffff::2",
+                "fec0:0:0:ffff::3"
+              ],
+              "domainName": null
+            },
+            "ipRouteConfig": {
+              "ipRoute": [
+                {
+                  "gateway": {
+                    "device": "0",
+                    "ipAddress": "172.20.64.1"
+                  },
+                  "network": "0.0.0.0",
+                  "prefixLength": 0
+                },
+                {
+                  "gateway": {
+                    "device": "0"
+                  },
+                  "network": "172.20.64.0",
+                  "prefixLength": 24
+                },
+                {
+                  "gateway": {
+                    "device": "0"
+                  },
+                  "network": "172.20.64.54",
+                  "prefixLength": 32
+                },
+                {
+                  "gateway": {
+                    "device": "0"
+                  },
+                  "network": "172.20.64.255",
+                  "prefixLength": 32
+                },
+                {
+                  "gateway": {
+                    "device": "0"
+                  },
+                  "network": "224.0.0.0",
+                  "prefixLength": 4
+                },
+                {
+                  "gateway": {
+                    "device": "0"
+                  },
+                  "network": "255.255.255.255",
+                  "prefixLength": 32
+                },
+                {
+                  "gateway": {
+                    "device": "0"
+                  },
+                  "network": "fe80::",
+                  "prefixLength": 64
+                },
+                {
+                  "gateway": {
+                    "device": "0"
+                  },
+                  "network": "fe80::29a2:351f:6f8:aceb",
+                  "prefixLength": 128
+                },
+                {
+                  "gateway": {
+                    "device": "0"
+                  },
+                  "network": "ff00::",
+                  "prefixLength": 8
+                }
+              ]
+            }
+          }
+        ],
+        "hostName": "WIN-0JL9PTQS2LQ",
+        "ipAddress": "172.20.64.54",
+        "guestState": "running",
+        "guestFamily": "windowsGuest",
+        "toolsStatus": "toolsOk",
+        "toolsVersion": "11269",
+        "guestFullName": "Microsoft Windows Server 2012 (64-bit)",
+        "toolsRunningStatus": "guestToolsRunning",
+        "toolsVersionStatus": "guestToolsCurrent",
+        "toolsVersionStatus2": "guestToolsSupportedNew",
+        "guestOperationsReady": true,
+        "interactiveGuestOperationsReady": false
+      }
+    },
+    {
+      "name": "yung-rhel8-test",
+      "location": "vcenter2.chalupaul.com",
+      "provider_account_id": "c398934c-1064-4df5-846b-611fd9256e7c",
+      "id": "4703a539-2406-4e81-a670-c080bab67ad3",
+      "_rackspace": null,
+      "_metadata": {
+        "sddcId": "ff1a7744-750b-44dc-9931-29830371c448"
+      },
+      "availableField": [
+        {
+          "key": 131,
+          "name": "Backup Status",
+          "type": "string",
+          "managedObjectType": "VirtualMachine"
+        },
+        {
+          "key": 119,
+          "name": "Last Backup",
+          "type": "string",
+          "managedObjectType": "VirtualMachine"
+        },
+        {
+          "key": 117,
+          "name": "com.rackspace.deviceId",
+          "type": "string"
+        },
+        {
+          "key": 132,
+          "name": "com.rackspace.goss.vm.os_type",
+          "type": "string",
+          "managedObjectType": "VirtualMachine"
+        },
+        {
+          "key": 136,
+          "name": "com.rackspace.goss.vm.services.monitoring",
+          "type": "string",
+          "managedObjectType": "VirtualMachine"
+        },
+        {
+          "key": 134,
+          "name": "com.rackspace.goss.vm.services.os.admin",
+          "type": "string",
+          "managedObjectType": "VirtualMachine"
+        },
+        {
+          "key": 135,
+          "name": "com.rackspace.goss.vm.services.patching",
+          "type": "string",
+          "managedObjectType": "VirtualMachine"
+        },
+        {
+          "key": 133,
+          "name": "com.rackspace.goss.vm.ssmid",
+          "type": "string",
+          "managedObjectType": "VirtualMachine"
+        },
+        {
+          "key": 129,
+          "name": "com.rackspace.rpcv.goss",
+          "type": "string"
+        },
+        {
+          "key": 130,
+          "name": "com.rackspace.rpcv.goss.ipAllocationDevice",
+          "type": "string"
+        },
+        {
+          "key": 116,
+          "name": "com.rackspace.rpcv.goss.services.antivirus",
+          "type": "string"
+        },
+        {
+          "key": 115,
+          "name": "com.rackspace.rpcv.goss.services.monitoring",
+          "type": "string"
+        },
+        {
+          "key": 114,
+          "name": "com.rackspace.rpcv.goss.services.patching",
+          "type": "string"
+        },
+        {
+          "key": 122,
+          "name": "com.rackspace.rpcv.goss.vm.services.antivirus",
+          "type": "string"
+        },
+        {
+          "key": 120,
+          "name": "com.rackspace.rpcv.goss.vm.services.monitoring",
+          "type": "string"
+        },
+        {
+          "key": 118,
+          "name": "com.rackspace.rpcv.goss.vm.services.os.admin",
+          "type": "string"
+        },
+        {
+          "key": 121,
+          "name": "com.rackspace.rpcv.goss.vm.services.patching",
+          "type": "string"
+        }
+      ],
+      "value": [
+        {
+          "key": 117,
+          "value": "1071844"
+        },
+        {
+          "key": 119,
+          "value": "6/12/2020 12:22:53 AM"
+        },
+        {
+          "key": 131,
+          "value": "Backup Job ID [13283890]  Client: [5050906-984435], Backup Set: [defaultBackupSet], Subclient: [vCenter-Compute]"
+        }
+      ],
+      "config$instanceUuid": "503f313b-51bc-ca95-84c4-7aa7afda0916",
+      "config$uuid": "423fd2bf-310a-ea12-f1e9-401f4b70a6f9",
+      "guest": {
+        "net": [
+          {
+            "network": "ExNet-Inside-VLAN-1051",
+            "ipConfig": {
+              "ipAddress": [
+                {
+                  "state": "preferred",
+                  "ipAddress": "172.20.64.18",
+                  "prefixLength": 24
+                }
+              ]
+            },
+            "connected": false,
+            "ipAddress": [
+              "172.20.64.18"
+            ],
+            "macAddress": "00:50:56:bf:ff:3e",
+            "deviceConfigId": 4000
+          }
+        ],
+        "disk": [
+          {
+            "capacity": "18238930944",
+            "diskPath": "/",
+            "freeSpace": "16228810752"
+          },
+          {
+            "capacity": "1063256064",
+            "diskPath": "/boot",
+            "freeSpace": "879538176"
+          }
+        ],
+        "guestId": null,
+        "ipStack": [
+          {
+            "dnsConfig": {
+              "dhcp": false,
+              "hostName": "localhost.localdomain",
+              "ipAddress": [
+                "127.0.0.1"
+              ],
+              "domainName": "localdomain",
+              "searchDomain": [
+                "localdomain"
+              ]
+            },
+            "ipRouteConfig": {
+              "ipRoute": [
+                {
+                  "gateway": {
+                    "device": "0",
+                    "ipAddress": "172.20.64.1"
+                  },
+                  "network": "0.0.0.0",
+                  "prefixLength": 0
+                },
+                {
+                  "gateway": {
+                    "device": "0"
+                  },
+                  "network": "172.20.64.0",
+                  "prefixLength": 24
+                }
+              ]
+            }
+          }
+        ],
+        "hostName": "localhost.localdomain",
+        "ipAddress": "172.20.64.18",
+        "guestState": "running",
+        "guestFamily": "otherGuestFamily",
+        "toolsStatus": "toolsOk",
+        "toolsVersion": "10346",
+        "guestFullName": "Linux 4.18.0-147.el8.x86_64 Red Hat Enterprise Linux release 8.1 (Ootpa)",
+        "toolsRunningStatus": "guestToolsRunning",
+        "toolsVersionStatus": "guestToolsUnmanaged",
+        "toolsVersionStatus2": "guestToolsUnmanaged",
+        "guestOperationsReady": true,
+        "interactiveGuestOperationsReady": false
+      }
+    },
+    {
+      "name": "Hounsou-Test-2019-Std",
+      "location": "vcenter2.chalupaul.com",
+      "provider_account_id": "c398934c-1064-4df5-846b-611fd9256e7c",
+      "id": "ef161bde-7c6c-4c87-b87a-896c4c9ef974",
+      "_rackspace": null,
+      "_metadata": {
+        "sddcId": "ff1a7744-750b-44dc-9931-29830371c448"
+      },
+      "availableField": [
+        {
+          "key": 131,
+          "name": "Backup Status",
+          "type": "string",
+          "managedObjectType": "VirtualMachine"
+        },
+        {
+          "key": 119,
+          "name": "Last Backup",
+          "type": "string",
+          "managedObjectType": "VirtualMachine"
+        },
+        {
+          "key": 117,
+          "name": "com.rackspace.deviceId",
+          "type": "string"
+        },
+        {
+          "key": 132,
+          "name": "com.rackspace.goss.vm.os_type",
+          "type": "string",
+          "managedObjectType": "VirtualMachine"
+        },
+        {
+          "key": 136,
+          "name": "com.rackspace.goss.vm.services.monitoring",
+          "type": "string",
+          "managedObjectType": "VirtualMachine"
+        },
+        {
+          "key": 134,
+          "name": "com.rackspace.goss.vm.services.os.admin",
+          "type": "string",
+          "managedObjectType": "VirtualMachine"
+        },
+        {
+          "key": 135,
+          "name": "com.rackspace.goss.vm.services.patching",
+          "type": "string",
+          "managedObjectType": "VirtualMachine"
+        },
+        {
+          "key": 133,
+          "name": "com.rackspace.goss.vm.ssmid",
+          "type": "string",
+          "managedObjectType": "VirtualMachine"
+        },
+        {
+          "key": 129,
+          "name": "com.rackspace.rpcv.goss",
+          "type": "string"
+        },
+        {
+          "key": 130,
+          "name": "com.rackspace.rpcv.goss.ipAllocationDevice",
+          "type": "string"
+        },
+        {
+          "key": 116,
+          "name": "com.rackspace.rpcv.goss.services.antivirus",
+          "type": "string"
+        },
+        {
+          "key": 115,
+          "name": "com.rackspace.rpcv.goss.services.monitoring",
+          "type": "string"
+        },
+        {
+          "key": 114,
+          "name": "com.rackspace.rpcv.goss.services.patching",
+          "type": "string"
+        },
+        {
+          "key": 122,
+          "name": "com.rackspace.rpcv.goss.vm.services.antivirus",
+          "type": "string"
+        },
+        {
+          "key": 120,
+          "name": "com.rackspace.rpcv.goss.vm.services.monitoring",
+          "type": "string"
+        },
+        {
+          "key": 118,
+          "name": "com.rackspace.rpcv.goss.vm.services.os.admin",
+          "type": "string"
+        },
+        {
+          "key": 121,
+          "name": "com.rackspace.rpcv.goss.vm.services.patching",
+          "type": "string"
+        }
+      ],
+      "value": [
+        {
+          "key": 117,
+          "value": "1094402"
+        },
+        {
+          "key": 119,
+          "value": "6/12/2020 12:27:16 AM"
+        },
+        {
+          "key": 131,
+          "value": "Backup Job ID [13283890]  Client: [5050906-984435], Backup Set: [defaultBackupSet], Subclient: [vCenter-Compute]"
+        }
+      ],
+      "config$instanceUuid": "503f5dab-7bb7-f35d-a57f-2f4b04bc62f5",
+      "config$uuid": "423fcf27-599f-dfd0-f426-43e069167d39",
+      "guest": {
+        "net": [
+          {
+            "network": "ExNet-Inside-VLAN-1051",
+            "ipConfig": {
+              "dhcp": {
+                "ipv4": {
+                  "enable": false
+                },
+                "ipv6": {
+                  "enable": false
+                }
+              },
+              "ipAddress": [
+                {
+                  "state": "unknown",
+                  "origin": "linklayer",
+                  "ipAddress": "fe80::1cda:4385:9345:94b4",
+                  "prefixLength": 64
+                },
+                {
+                  "state": "preferred",
+                  "origin": "manual",
+                  "ipAddress": "172.20.64.48",
+                  "prefixLength": 24
+                }
+              ]
+            },
+            "connected": true,
+            "dnsConfig": {
+              "dhcp": false,
+              "hostName": null,
+              "ipAddress": [
+                "8.8.8.8",
+                "8.8.4.4"
+              ],
+              "domainName": null
+            },
+            "ipAddress": [
+              "fe80::1cda:4385:9345:94b4",
+              "172.20.64.48"
+            ],
+            "macAddress": "00:50:56:bf:0c:cd",
+            "deviceConfigId": 4000
+          }
+        ],
+        "disk": [
+          {
+            "capacity": "42371903488",
+            "diskPath": "C:\\",
+            "freeSpace": "31220584448"
+          }
+        ],
+        "guestId": null,
+        "ipStack": [
+          {
+            "dnsConfig": {
+              "dhcp": false,
+              "hostName": "WIN-T85MRBB8TOR",
+              "ipAddress": [
+                "8.8.8.8",
+                "8.8.4.4"
+              ],
+              "domainName": null
+            },
+            "ipRouteConfig": {
+              "ipRoute": [
+                {
+                  "gateway": {
+                    "device": "0",
+                    "ipAddress": "172.20.64.1"
+                  },
+                  "network": "0.0.0.0",
+                  "prefixLength": 0
+                },
+                {
+                  "gateway": {
+                    "device": "0"
+                  },
+                  "network": "172.20.64.0",
+                  "prefixLength": 24
+                },
+                {
+                  "gateway": {
+                    "device": "0"
+                  },
+                  "network": "172.20.64.48",
+                  "prefixLength": 32
+                },
+                {
+                  "gateway": {
+                    "device": "0"
+                  },
+                  "network": "172.20.64.255",
+                  "prefixLength": 32
+                },
+                {
+                  "gateway": {
+                    "device": "0"
+                  },
+                  "network": "224.0.0.0",
+                  "prefixLength": 4
+                },
+                {
+                  "gateway": {
+                    "device": "0"
+                  },
+                  "network": "255.255.255.255",
+                  "prefixLength": 32
+                },
+                {
+                  "gateway": {
+                    "device": "0"
+                  },
+                  "network": "fe80::",
+                  "prefixLength": 64
+                },
+                {
+                  "gateway": {
+                    "device": "0"
+                  },
+                  "network": "fe80::1cda:4385:9345:94b4",
+                  "prefixLength": 128
+                },
+                {
+                  "gateway": {
+                    "device": "0"
+                  },
+                  "network": "ff00::",
+                  "prefixLength": 8
+                }
+              ]
+            }
+          }
+        ],
+        "hostName": "WIN-T85MRBB8TOR",
+        "ipAddress": "172.20.64.48",
+        "guestState": "running",
+        "guestFamily": "otherGuestFamily",
+        "toolsStatus": "toolsOk",
+        "toolsVersion": "11269",
+        "guestFullName": "Windows Server 2019, 64-bit  (Build 17763)",
+        "toolsRunningStatus": "guestToolsRunning",
+        "toolsVersionStatus": "guestToolsCurrent",
+        "toolsVersionStatus2": "guestToolsSupportedNew",
+        "guestOperationsReady": true,
+        "interactiveGuestOperationsReady": true
+      }
+    }
+  ]
+}

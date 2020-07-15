@@ -1,0 +1,24 @@
+{
+  "meta": {
+    "page_size": 500,
+    "current_page": 1,
+    "last_page": true,
+    "next_page": null,
+    "prev_page": null,
+    "next_token": null
+  },
+  "data": [
+    {
+      "id": "e3d5bba7-6f86-48da-b2cc-96cc4c458532",
+      "location": "vs710.lab.ord1.rvi.rax.io",
+      "resource_id": "host-729",
+      "name": "364027-hyp90.ord1.rvi.local",
+      "_rackspace": {
+        "deviceId": "364027",
+        "accountId": "1018700",
+        "datacenter": "ORD1",
+        "vcenterType": "MANAGED_VIRT"
+      }
+    }
+  ]
+}

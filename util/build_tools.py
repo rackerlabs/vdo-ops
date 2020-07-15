@@ -92,5 +92,6 @@ def print_env_vars() -> None:
         )
     print(response)
 
+
 def poetry_wrapper_coverage() -> None:
     print(get_last_coverage_run())

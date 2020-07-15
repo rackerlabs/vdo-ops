@@ -1,0 +1,113 @@
+[
+  {
+    "name": "some-test",
+    "location": "vcenter2.chalupaul.com",
+    "provider_account_id": "c398934c-1064-4df5-846b-611fd9256e7c",
+    "id": "00afb8e2-b83f-41b4-a1df-ffc66ff3fc47",
+    "_rackspace": null,
+    "_metadata": {
+      "sddcId": "ff1a7744-750b-44dc-9931-29830371c448",
+      "orgId": "c398934c-1064-4df5-846b-611fd9256e7c"
+    },
+    "availableField": [
+      {
+        "key": 117,
+        "name": "com.rackspace.deviceId",
+        "type": "string"
+      },
+      {
+        "key": 132,
+        "name": "com.rackspace.goss.vm.os_type",
+        "type": "string",
+        "managedObjectType": "VirtualMachine"
+      },
+      {
+        "key": 136,
+        "name": "com.rackspace.goss.vm.services.monitoring",
+        "type": "string",
+        "managedObjectType": "VirtualMachine"
+      },
+      {
+        "key": 134,
+        "name": "com.rackspace.goss.vm.services.os.admin",
+        "type": "string",
+        "managedObjectType": "VirtualMachine"
+      },
+      {
+        "key": 135,
+        "name": "com.rackspace.goss.vm.services.patching",
+        "type": "string",
+        "managedObjectType": "VirtualMachine"
+      },
+      {
+        "key": 133,
+        "name": "com.rackspace.goss.vm.ssmid",
+        "type": "string",
+        "managedObjectType": "VirtualMachine"
+      },
+      {
+        "key": 129,
+        "name": "com.rackspace.rpcv.goss",
+        "type": "string"
+      },
+      {
+        "key": 130,
+        "name": "com.rackspace.rpcv.goss.ipAllocationDevice",
+        "type": "string"
+      },
+      {
+        "key": 116,
+        "name": "com.rackspace.rpcv.goss.services.antivirus",
+        "type": "string"
+      },
+      {
+        "key": 115,
+        "name": "com.rackspace.rpcv.goss.services.monitoring",
+        "type": "string"
+      },
+      {
+        "key": 114,
+        "name": "com.rackspace.rpcv.goss.services.patching",
+        "type": "string"
+      },
+      {
+        "key": 122,
+        "name": "com.rackspace.rpcv.goss.vm.services.antivirus",
+        "type": "string"
+      },
+      {
+        "key": 120,
+        "name": "com.rackspace.rpcv.goss.vm.services.monitoring",
+        "type": "string"
+      },
+      {
+        "key": 118,
+        "name": "com.rackspace.rpcv.goss.vm.services.os.admin",
+        "type": "string"
+      },
+      {
+        "key": 121,
+        "name": "com.rackspace.rpcv.goss.vm.services.patching",
+        "type": "string"
+      }
+    ],
+    "value": [
+      {
+        "key": 117,
+        "value": "1098922"
+      },
+      {
+        "key": 119,
+        "value": "6/12/2020 12:27:09 AM"
+      },
+      {
+        "key": 131,
+        "value": "Backup Job ID [13283890]  Client: [5050906-984435], Backup Set: [defaultBackupSet], Subclient: [vCenter-Compute]"
+      }
+    ],
+    "config$instanceUuid": "503fcf32-471c-c6c2-6e0d-e8024987079f",
+    "config$uuid": "423ffa50-6e29-10f2-339c-0d96e12d51f3",
+    "guest": {},
+    "service_value": 7
+  }
+]
