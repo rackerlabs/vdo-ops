@@ -3,9 +3,6 @@ from typing import Any, Dict
 
 from common import constants
 from common.clients import boto
-from common.clients.boto import ClientType
-
-CLIENT = boto.get_client(ClientType.SIMPLE_SYSTEMS_MANAGER)
 
 
 def get_path(category: str = "") -> str:
@@ -16,9 +13,10 @@ def get_path(category: str = "") -> str:
 
 
 def get_secrets_from_ssm(category: str = "") -> Dict[str, Any]:
+    ssm_client = boto.get_client(boto.ClientType.SIMPLE_SYSTEMS_MANAGER)
     secrets: Dict[str, Any] = {}
     path = get_path(category)
-    params = CLIENT.get_parameters_by_path(
+    params = ssm_client.get_parameters_by_path(
         Path=f"{path}/", Recursive=True, WithDecryption=True
     )["Parameters"]
     for param in params:
@@ -28,5 +26,6 @@ def get_secrets_from_ssm(category: str = "") -> Dict[str, Any]:
 
 
 def get_parameter(path):
-    result = CLIENT.get_parameter(Name=path, WithDecryption=True)
+    ssm_client = boto.get_client(boto.ClientType.SIMPLE_SYSTEMS_MANAGER)
+    result = ssm_client.get_parameter(Name=path, WithDecryption=True)
     return result["Parameter"]["Value"]

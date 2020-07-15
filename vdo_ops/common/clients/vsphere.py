@@ -107,38 +107,35 @@ class VsphereClient:
         host = self.get_host_system(host_name)
         return [*host.config.network.vnic, *host.config.network.consoleVnic]
 
-    def is_in_do_cot_copy_lsit(self, host_name, portgroup_name):
+    def is_in_do_not_copy_list(self, host_name, portgroup_name):
         """
         Checks to see if the given port group is in the do not
         copy list of the given host.
         """
-        return [
-            vnic
-            for vnic in self.get_do_not_copy_list(host_name)
-            if vnic.portgroup == portgroup_name
-        ]
+        for vnic in self.get_do_not_copy_list(host_name):
+            if vnic.portgroup == portgroup_name:
+                return True
+        return False
 
     def has_virtual_switch(self, host_name, vswitch_name):
         """
         Checks to see if the given host system has the given virtual switch.
         """
         host = self.get_host_system(host_name)
-        return [
-            vswitch
-            for vswitch in host.config.network.vswitch
-            if vswitch.name == vswitch_name
-        ]
+        for vswitch in host.config.network.vswitch:
+            if vswitch.name == vswitch_name:
+                return True
+        return False
 
     def has_portgroup(self, host_name, portgroup_name):
         """
         Checks to see if the given host system has the given port group.
         """
         host = self.get_host_system(host_name)
-        return [
-            portgroup
-            for portgroup in host.config.network.portgroup
-            if portgroup.spec.name == portgroup_name
-        ]
+        for portgroup in host.config.network.portgroup:
+            if portgroup.spec.name == portgroup_name:
+                return True
+        return False
 
     def add_host_vswitch(self, host_name, vswitch_name, vswitch_spec):
         """
