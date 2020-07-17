@@ -1,5 +1,4 @@
 import json
-import re
 from typing import Any, Dict, List, Tuple
 
 import requests
@@ -7,35 +6,10 @@ from fleece.authpolicy import AuthPolicy
 from requests.structures import CaseInsensitiveDict
 
 from common import log
-from common.utils.util import compile_ant_path
 
 logger = log.get_logger(__name__)
 
 TOKEN_URL_FMT = "https://heimdall.api.manage.rackspace.com/v2.0/tokens/{token}"
-
-ALLOWED_APIS_WITHOUT_DOMAIN = [
-    compile_ant_path("/GET/api/orgs"),
-    compile_ant_path("/GET/api/clusters"),
-    compile_ant_path("/GET/api/clusters/vcenter/*"),
-]
-
-
-def _match_allowed_apis_without_domain(method_arn: str) -> bool:
-    for regex in ALLOWED_APIS_WITHOUT_DOMAIN:
-        if re.fullmatch(regex, f"/{_get_path_from_arn(method_arn)}"):
-            return True
-    return False
-
-
-def _get_path_from_arn(method_arn: str) -> str:
-    # arn:aws:execute-api:us-west-2:816569674899:pu6g2fvlud/zaheena/GET/api/clusters/vcenter/dvc01m.jp2e-19507205.rpcv.rackspace-cloud.com
-    parts = method_arn.split(":")
-
-    # pu6g2fvlud/zaheena/GET/api/clusters/vcenter/dvc01m.jp2e-19507205.rpcv.rackspace-cloud.com
-    api_gateway_arn = parts[5].split("/")
-
-    # Now we want to ignore the first two pieces 0 and 1 and concat the rest with /
-    return "/".join(api_gateway_arn[2:])
 
 
 def validate(token: str) -> Any:
@@ -101,7 +75,7 @@ def handler(event: Dict[str, Any], context: Any) -> Any:
     else:
         domain_id = identity["access"]["user"].get("RAX-AUTH:domainId", None)
 
-    if domain_id is not None or _match_allowed_apis_without_domain(method_arn):
+    if domain_id:
         policy.allow_all_methods()
 
         response = policy.build()
